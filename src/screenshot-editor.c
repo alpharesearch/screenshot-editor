@@ -95,7 +95,7 @@ main (int argc, char *argv[])
 
   return 0;
 }
-
+ 
 
 /* This handles button presses in item views. We simply output a message to
    the console. */
