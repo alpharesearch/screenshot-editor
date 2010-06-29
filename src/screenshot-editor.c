@@ -1,6 +1,12 @@
 #include <stdlib.h>
 #include <goocanvas.h>
+#include <gtk/gtk.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
+#include <string.h>
+#include <stdio.h>
 
+
+#include "../config.h"
 
 static gboolean on_rect_button_press (GooCanvasItem  *view,
                                       GooCanvasItem  *target,
@@ -16,15 +22,27 @@ int
 main (int argc, char *argv[])
 {
   GtkWidget *window, *scrolled_win, *canvas;
-  GooCanvasItem *root, *rect_item, *text_item;
+  GooCanvasItem *root, *rect_item, *text_item, *image_item;
+
+	GdkPixbuf *pb;
 
   /* Initialize GTK+. */
   gtk_set_locale ();
   gtk_init (&argc, &argv);
+	
+
+
+	pb=gdk_pixbuf_new_from_file("test-screenshot.png", NULL);
+
+
+	if(!pb) {
+		printf("error: gdk_pixbuf_new_from_file");
+		exit(1);
+	}
 
   /* Create the window and widgets. */
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_default_size (GTK_WINDOW (window), 640, 600);
+  gtk_window_set_default_size (GTK_WINDOW (window), 740, 700);
   gtk_widget_show (window);
   g_signal_connect (window, "delete_event", (GtkSignalFunc) on_delete_event,
                     NULL);
@@ -36,27 +54,37 @@ main (int argc, char *argv[])
   gtk_container_add (GTK_CONTAINER (window), scrolled_win);
 
   canvas = goo_canvas_new ();
-  gtk_widget_set_size_request (canvas, 600, 450);
+  gtk_widget_set_size_request (canvas, 640, 600);
   goo_canvas_set_bounds (GOO_CANVAS (canvas), 0, 0, 1000, 1000);
   gtk_widget_show (canvas);
   gtk_container_add (GTK_CONTAINER (scrolled_win), canvas);
 
   root = goo_canvas_get_root_item (GOO_CANVAS (canvas));
 
-  /* Add a few simple items. */
-  rect_item = goo_canvas_rect_new (root, 100, 100, 400, 400,
-                                   "line-width", 10.0,
-                                   "radius-x", 20.0,
-                                   "radius-y", 10.0,
-                                   "stroke-color", "yellow",
-                                   "fill-color", "red",
-                                   NULL);
+	image_item = goo_canvas_image_new (root, pb, 0, 0, NULL);
 
-  text_item = goo_canvas_text_new (root, "Hello World", 300, 300, -1,
-                                   GTK_ANCHOR_CENTER,
-                                   "font", "Sans 24",
+  /* Add a few simple items. */
+  rect_item = goo_canvas_rect_new (root, 20, 20, 200, 200,
+                                   "line-width", 5.0,
+                                   "radius-x", 10.0,
+                                   "radius-y", 5.0,
+                                   "stroke-color", "red",
                                    NULL);
-  goo_canvas_item_rotate (text_item, 45, 300, 300);
+                                   
+  GooCanvasItem *polyline0 = goo_canvas_polyline_new_line (root,
+                                                        100.0, 100.0,
+                                                        500.0, 500.0,
+                                                        "stroke-color", "red",
+                                                        "line-width", 5.0,
+                                                        "start-arrow", TRUE,
+                                                        NULL);
+                            
+
+  //text_item = goo_canvas_text_new (root, PACKAGE_STRING, 300, 300, -1,
+                                   //GTK_ANCHOR_CENTER,
+                                   //"font", "Sans 24px",
+                                   //NULL);
+  //goo_canvas_item_rotate (text_item, 45, 300, 300);
 
   /* Connect a signal handler for the rectangle item. */
   g_signal_connect (rect_item, "button_press_event",
