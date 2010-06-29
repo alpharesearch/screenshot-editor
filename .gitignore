@@ -16,3 +16,5 @@ install-sh
 missing
 stamp-h1
 /src/.deps/
+/src/screenshot-editor
+/src/screenshot-editor.o
